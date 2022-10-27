@@ -1,10 +1,11 @@
-package ingredient
+package recipe
 
 import "gorm.io/gorm"
 
 type Ingredient struct {
 	gorm.Model
-	Name string
+	Name    string
+	Recipes []*Recipe `gorm:"many2many:recipe_ingredient;"`
 }
 
 func NewIngredientService(db *gorm.DB) *IngredientService {

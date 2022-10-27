@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mjehanno/welsh-academy/pkg/ingredient"
+	"github.com/mjehanno/welsh-academy/pkg/recipe"
 	"github.com/mjehanno/welsh-academy/pkg/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -13,7 +13,8 @@ import (
 
 var db *gorm.DB
 var userService *user.UserService
-var ingredientService *ingredient.IngredientService
+var ingredientService *recipe.IngredientService
+var recipeService *recipe.RecipeService
 
 func init() {
 	var err error
@@ -23,12 +24,13 @@ func init() {
 	if err != nil {
 		log.Fatalf("couldn't connect to database : %w", err)
 	}
-	db.AutoMigrate(&user.User{}, &ingredient.Ingredient{})
+	db.AutoMigrate(&user.User{}, &recipe.Ingredient{}, &recipe.Recipe{})
 }
 
 func main() {
 	userService = user.NewUserService(db)
-	ingredientService = ingredient.NewIngredientService(db)
+	ingredientService = recipe.NewIngredientService(db)
+	recipeService = recipe.NewRecipeService(db)
 
 	r := gin.Default()
 	api := r.Group("/api")
@@ -43,6 +45,10 @@ func main() {
 			{
 				ingredient.POST("/", createIngredientEndpoint)
 				ingredient.GET("/", getIngredientEndpoint)
+			}
+			recipe := v1.Group("/recipes")
+			{
+				recipe.GET("/", getRecipeEndoint)
 			}
 		}
 	}
@@ -69,7 +75,7 @@ func createUserEndpoint(c *gin.Context) {
 }
 
 func createIngredientEndpoint(c *gin.Context) {
-	var json ingredient.Ingredient
+	var json recipe.Ingredient
 
 	if err := c.ShouldBindJSON(&json); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -92,5 +98,15 @@ func getIngredientEndpoint(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{})
 	}
 
-	c.JSON(http.StatusAccepted, ingredients)
+	c.JSON(http.StatusOK, ingredients)
+}
+
+func getRecipeEndoint(c *gin.Context) {
+	recipes, err := recipeService.GetAllRecipe()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+	}
+
+	c.JSON(http.StatusOK, recipes)
 }
