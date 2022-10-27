@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mjehanno/welsh-academy/pkg/recipe"
@@ -40,6 +39,7 @@ func main() {
 			user := v1.Group("/users")
 			{
 				user.POST("/", createUserEndpoint)
+				user.POST("/login", loginUserEndpoint)
 			}
 			ingredient := v1.Group("/ingredients")
 			{
@@ -55,77 +55,4 @@ func main() {
 	}
 
 	r.Run()
-}
-
-func createUserEndpoint(c *gin.Context) {
-	var json user.User
-
-	if err := c.ShouldBindJSON(&json); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	id, err := userService.CreateUser(json)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
-	}
-
-	c.JSON(http.StatusCreated, gin.H{
-		"id": id,
-	})
-}
-
-func createIngredientEndpoint(c *gin.Context) {
-	var json recipe.Ingredient
-
-	if err := c.ShouldBindJSON(&json); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	id, err := ingredientService.CreateIngredient(json)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
-	}
-
-	c.JSON(http.StatusCreated, gin.H{
-		"id": id,
-	})
-}
-
-func getIngredientEndpoint(c *gin.Context) {
-	ingredients, err := ingredientService.GetAllIngredient()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
-	}
-
-	c.JSON(http.StatusOK, ingredients)
-}
-
-func getRecipeEndoint(c *gin.Context) {
-	recipes, err := recipeService.GetAllRecipe()
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
-	}
-
-	c.JSON(http.StatusOK, recipes)
-}
-
-func createRecipeEndpoint(c *gin.Context) {
-	var json recipe.Recipe
-
-	if err := c.ShouldBindJSON(&json); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	id, err := recipeService.CreateRecipe(json)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
-	}
-
-	c.JSON(http.StatusCreated, gin.H{
-		"id": id,
-	})
 }
