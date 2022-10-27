@@ -23,7 +23,7 @@ func NewRecipeService(db *gorm.DB) *RecipeService {
 func (rs *RecipeService) GetAllRecipe() ([]Recipe, error) {
 	var recipe []Recipe
 
-	result := rs.db.Find(&recipe)
+	result := rs.db.Model(&Recipe{}).Preload("Ingredients").Find(&recipe)
 
 	return recipe, result.Error
 }
