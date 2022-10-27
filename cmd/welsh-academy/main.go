@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mjehanno/welsh-academy/pkg/recipe"
@@ -17,7 +18,7 @@ var recipeService *recipe.RecipeService
 
 func init() {
 	var err error
-	dsn := "host=localhost user=nimda password=nimda dbname=welsh port=5432 sslmode=disable "
+	dsn := "host=" + os.Getenv("DB_HOST") + " user=" + os.Getenv("DB_USER") + " password=" + os.Getenv("DB_PASS") + " dbname=" + os.Getenv("DB_NAME") + " port=" + os.Getenv("DB_PORT") + " sslmode=disable "
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {

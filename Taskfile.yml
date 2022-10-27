@@ -7,3 +7,10 @@ tasks:
   build:
     cmds:
       - go build -o ./bin/welsh-academy ./cmd/welsh-academy/.
+  docker-build:
+      - docker build . -t welsh-academy 
+  docker-run:
+      deps: [docker-build]
+      cmds:
+          - docker run -p 9000:9000 {{.CLI_ARGS}} welsh-academy
+
