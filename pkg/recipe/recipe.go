@@ -27,3 +27,10 @@ func (rs *RecipeService) GetAllRecipe() ([]Recipe, error) {
 
 	return recipe, result.Error
 }
+
+func (rs *RecipeService) CreateRecipe(recipe Recipe) (uint, error) {
+
+	result := rs.db.Create(&recipe)
+
+	return recipe.ID, result.Error
+}
