@@ -8,6 +8,31 @@ import (
 )
 
 func getRecipeEndoint(c *gin.Context) {
+	if len(c.QueryArray("ingredient")) > 0 {
+		ingredientsName := c.QueryArray("ingredient")
+		ingredients := make([]recipe.Ingredient, len(ingredientsName))
+
+		for i, name := range ingredientsName {
+			ing, err := ingredientService.GetIngredientByName(name)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, nil)
+				return
+			}
+
+			ingredients[i] = ing
+		}
+
+		recipes, err := recipeService.GetRecipeByIngredient(ingredients)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, nil)
+			return
+		}
+
+		c.JSON(http.StatusOK, recipes)
+		return
+
+	}
+
 	recipes, err := recipeService.GetAllRecipe()
 
 	if err != nil {
@@ -35,4 +60,7 @@ func createRecipeEndpoint(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"id": id,
 	})
+}
+
+func getRecipeByIngredientEndpoint(c *gin.Context) {
 }

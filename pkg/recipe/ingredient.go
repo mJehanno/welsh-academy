@@ -25,10 +25,24 @@ func (is *IngredientService) CreateIngredient(ingredient Ingredient) (uint, erro
 	return ingredient.ID, result.Error
 }
 
+func (is *IngredientService) GetIngredientByName(name string) (Ingredient, error) {
+	var ingredient Ingredient
+
+	result := is.db.Where("name = ?", name).First(&ingredient)
+
+	return ingredient, result.Error
+}
+
 func (is *IngredientService) GetAllIngredient() ([]Ingredient, error) {
 	var ingredients []Ingredient
 
 	result := is.db.Find(&ingredients)
 
 	return ingredients, result.Error
+}
+
+func recipeByIngredient(ingredient Ingredient) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("id = ?", ingredient.ID)
+	}
 }
