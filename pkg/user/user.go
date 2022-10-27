@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// User represent a basic
+// User represent user.
 type User struct {
 	gorm.Model
 	Username         string          `gorm:"type:varchar(40);unique`
@@ -79,6 +79,7 @@ func (us *UserService) GetFavoriteRecipe(userID uint) ([]recipe.Recipe, error) {
 	return recipes, err
 }
 
+// DeleteFavoriteRecipe takes a recipe and a userID and remove this recipe from user's favorite recipe.
 func (us *UserService) DeleteFavoriteRecipe(recipe recipe.Recipe, userID uint) error {
 	var user User
 	us.db.Where("id=?", userID).First(&user)
