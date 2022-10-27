@@ -29,8 +29,14 @@ func (rs *RecipeService) GetAllRecipe() ([]Recipe, error) {
 }
 
 func (rs *RecipeService) CreateRecipe(recipe Recipe) (uint, error) {
-
 	result := rs.db.Create(&recipe)
 
 	return recipe.ID, result.Error
+}
+
+func (rs *RecipeService) GetRecipeById(recipeID uint) (Recipe, error) {
+	var recipe Recipe
+	result := rs.db.Where("id = ?", recipeID).Find(&recipe)
+
+	return recipe, result.Error
 }

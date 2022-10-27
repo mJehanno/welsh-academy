@@ -40,6 +40,13 @@ func main() {
 			{
 				user.POST("/", createUserEndpoint)
 				user.POST("/login", loginUserEndpoint)
+
+				favorites := user.Group("/favorites")
+				{
+					favorites.POST("/", createFavoriteRecipeEndpoint)
+					favorites.GET("/", getFavoriteRecipeEndpoint)
+					favorites.DELETE("/:recipeId", deleteFavoriteRecipeEndpoint)
+				}
 			}
 			ingredient := v1.Group("/ingredients")
 			{

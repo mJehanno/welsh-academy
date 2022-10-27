@@ -40,6 +40,7 @@ func (us *UserService) CreateUser(user User) (uint, error) {
 	return user.ID, result.Error
 }
 
+// LogUser verifies user credential to log him or not.
 func (us *UserService) LogUser(user User) (*User, error) {
 	h := sha256.New()
 	h.Write([]byte(user.Password))
@@ -59,6 +60,28 @@ func (us *UserService) LogUser(user User) (*User, error) {
 	return nil, nil
 }
 
-func (us *UserService) GetFavorites() ([]recipe.Recipe, error) {
-	return nil, nil
+// AddFavoriteRecipe takes a recipe and a userID (uint) and add the recipe to the corresponding user.
+func (us *UserService) AddFavoriteRecipe(recipe recipe.Recipe, userID uint) error {
+	var user User
+	us.db.Where("id=?", userID).First(&user)
+
+	return us.db.Model(&user).Association("FavoritesRecipes").Append(&recipe)
+}
+
+// GetFavoriteRecipe takes a userID(uint) and return his favorites recipes.
+func (us *UserService) GetFavoriteRecipe(userID uint) ([]recipe.Recipe, error) {
+	var user User
+	var recipes []recipe.Recipe
+	us.db.Where("id=?", userID).First(&user)
+
+	err := us.db.Preload("Ingredients").Model(&user).Association("FavoritesRecipes").Find(&recipes)
+
+	return recipes, err
+}
+
+func (us *UserService) DeleteFavoriteRecipe(recipe recipe.Recipe, userID uint) error {
+	var user User
+	us.db.Where("id=?", userID).First(&user)
+
+	return us.db.Model(&user).Association("FavoritesRecipes").Delete(&recipe)
 }
