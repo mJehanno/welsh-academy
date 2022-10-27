@@ -4,3 +4,6 @@ tasks:
   run:
     cmds:
       - go run ./cmd/welsh-academy/.
+  build:
+    cmds:
+      - go build -o ./bin/welsh-academy ./cmd/welsh-academy/.
