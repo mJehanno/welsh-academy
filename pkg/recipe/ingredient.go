@@ -3,10 +3,12 @@ package recipe
 import "gorm.io/gorm"
 
 // Ingredient defines a product in cooking.
+// @Description Ingredient defines a product in cooking.
 type Ingredient struct {
 	gorm.Model
-	Name    string
-	Recipes []*Recipe `gorm:"many2many:recipe_ingredient;"`
+	// The name of the ingredient
+	Name string `example:"cheddar"`
+	// Recipes []*Recipe `gorm:"many2many:recipe_ingredient;"`
 }
 
 // NewIngredientService is the IngredientService constructor.

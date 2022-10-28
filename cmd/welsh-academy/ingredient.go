@@ -4,20 +4,31 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mjehanno/welsh-academy/pkg/error"
 	"github.com/mjehanno/welsh-academy/pkg/recipe"
 )
 
+// @Summary      Create an Ingredient
+// @Description  Create an ingredient that you'll be able to use in a recipe.
+// @Tags         ingredients
+// @Accept       json
+// @Produce      json
+// @Param ingredient body recipe.Ingredient true "ingredient to create"
+// @Success      201  {integer}  id
+// @Failure      400  {object}  error.ErrorResponse
+// @Failure      500
+// @Router       /ingredients [post]
 func createIngredientEndpoint(c *gin.Context) {
 	var json recipe.Ingredient
 
 	if err := c.ShouldBindJSON(&json); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, error.ErrorResponse{ErrorMessage: err.Error()})
 		return
 	}
 
 	id, err := ingredientService.CreateIngredient(json)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		c.JSON(http.StatusInternalServerError, nil)
 		return
 	}
 
@@ -26,10 +37,17 @@ func createIngredientEndpoint(c *gin.Context) {
 	})
 }
 
+// @Summary      Get the list of ingredients.
+// @Description  Get the whole list of ingredients.
+// @Tags         ingredients
+// @Produce      json
+// @Success      200  {array}  recipe.Ingredient
+// @Failure      500
+// @Router       /ingredients [get]
 func getIngredientEndpoint(c *gin.Context) {
 	ingredients, err := ingredientService.GetAllIngredient()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		c.JSON(http.StatusInternalServerError, nil)
 		return
 	}
 

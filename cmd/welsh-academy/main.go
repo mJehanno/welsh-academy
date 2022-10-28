@@ -5,8 +5,11 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	docs "github.com/mjehanno/welsh-academy/docs"
 	"github.com/mjehanno/welsh-academy/pkg/recipe"
 	"github.com/mjehanno/welsh-academy/pkg/user"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -25,14 +28,26 @@ func init() {
 		log.Fatalf("couldn't connect to database : %w", err)
 	}
 	db.AutoMigrate(&user.User{}, &recipe.Ingredient{}, &recipe.Recipe{})
-}
 
-func main() {
 	userService = user.NewUserService(db)
 	ingredientService = recipe.NewIngredientService(db)
 	recipeService = recipe.NewRecipeService(db)
+}
 
+// @title           Welsh-Academy OpenAPI Spec
+// @version         1.0
+// @description     This is a rest api made to handle some recipe so please have a sit and chees... chill !
+// @termsOfService  http://swagger.io/terms/
+// @contact.name   API Support
+// @contact.email  mathob.jehanno@hotmail.fr
+// @license.name  Beerware 42.0
+// @host      localhost:9000
+// @BasePath  /api/v1
+func main() {
 	r := gin.Default()
+	r.SetTrustedProxies(nil)
+
+	docs.SwaggerInfo.BasePath = "/api/v1"
 	api := r.Group("/api")
 	{
 		v1 := api.Group("/v1")
@@ -61,6 +76,7 @@ func main() {
 			}
 		}
 	}
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	r.Run()
 }

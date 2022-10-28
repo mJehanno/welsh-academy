@@ -4,10 +4,13 @@ import (
 	"gorm.io/gorm"
 )
 
+// swagger:model Recipe
 // Recipe define a meal made with ingredients.
 type Recipe struct {
 	gorm.Model
-	Name        string
+	// The name of the Recipe
+	Name string `example:"welsh"`
+	// The list of ingredients in the recipe.
 	Ingredients []*Ingredient `gorm:"many2many:recipe_ingredient;"`
 }
 
@@ -54,7 +57,7 @@ func (rs *RecipeService) GetRecipeByIngredient(ingredients []Ingredient) ([]Reci
 		query.Where(tableAlias+".id=?", ing.ID)
 	}
 
-	result := query.Find(&recipes)
+	result := query.Preload("Ingredients").Find(&recipes)
 	return recipes, result.Error
 }
 

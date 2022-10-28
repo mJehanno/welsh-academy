@@ -11,9 +11,12 @@ import (
 // User represent user.
 type User struct {
 	gorm.Model
-	Username         string          `gorm:"type:varchar(40);unique`
-	Password         string          `gorm:"size:255", json:",omitempty"`
-	FavoritesRecipes []recipe.Recipe `gorm:"many2many:favorite_recipe"`
+	// The name of the user.
+	Username string `gorm:"type:varchar(40);unique" example:"admin"`
+	// The password of the user
+	Password string `gorm:"size:255" json:",omitempty" example:"admin"`
+	// The user's favorites recipes
+	FavoritesRecipes []recipe.Recipe `gorm:"many2many:favorite_recipe" swaggerignore:"true"`
 }
 
 // NewUserService is the constructor for a UserService.
