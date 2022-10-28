@@ -13,4 +13,9 @@ tasks:
       deps: [docker-build]
       cmds:
           - docker run -p 9000:9000 {{.CLI_ARGS}} welsh-academy
+  generate-swagger-doc:
+    aliases: [gen-swagger]
+    cmds: 
+      - swag init -g cmd/welsh-academy/main.go --parseDependency --parseInternal
 
+        
