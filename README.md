@@ -1,4 +1,6 @@
 # Welsh Academy
+<a href="https://goreportcard.com/report/github.com/mjehanno/welsh-academy"><img src="https://goreportcard.com/badge/github.com/mjehanno/welsh-academy"/></a>
+
 
 Welsh-Academy is a simple REST-API made to handle recipes and ingredients.
 
