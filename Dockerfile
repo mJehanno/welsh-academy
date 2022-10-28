@@ -13,12 +13,9 @@ ENV DB_NAME="welsh"
 RUN go mod download
 
 RUN go install github.com/go-task/task/v3/cmd/task@latest
-
-RUN task build
-
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 RUN task gen-swagger
+RUN task build
 
 ENTRYPOINT ["./bin/welsh-academy"]
-
