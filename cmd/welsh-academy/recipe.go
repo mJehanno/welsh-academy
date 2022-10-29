@@ -77,6 +77,11 @@ func createRecipeEndpoint(c *gin.Context) {
 		return
 	}
 
+	if json.Name == "" || len(json.Ingredients) == 0 {
+		c.JSON(http.StatusBadRequest, error.ErrorResponse{ErrorMessage: "can't create a recipe without a name or without ingredients"})
+		return
+	}
+
 	id, err := recipeService.CreateRecipe(json)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, nil)

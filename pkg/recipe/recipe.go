@@ -10,7 +10,7 @@ import (
 type Recipe struct {
 	gorm.Model
 	// The name of the Recipe
-	Name string `example:"welsh"`
+	Name string `example:"welsh" gorm:"unique;not null; default:null"`
 	// The list of ingredients in the recipe.
 	Ingredients []*ingredient.Ingredient `gorm:"many2many:recipe_ingredient;"`
 }

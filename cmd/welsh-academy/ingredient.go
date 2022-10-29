@@ -26,6 +26,11 @@ func createIngredientEndpoint(c *gin.Context) {
 		return
 	}
 
+	if json.Name == "" {
+		c.JSON(http.StatusBadRequest, error.ErrorResponse{ErrorMessage: "can't create ingredient with empty name"})
+		return
+	}
+
 	id, err := ingredientService.CreateIngredient(json)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, nil)
