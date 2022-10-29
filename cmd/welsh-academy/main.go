@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	docs "github.com/mjehanno/welsh-academy/docs"
+	"github.com/mjehanno/welsh-academy/pkg/ingredient"
 	"github.com/mjehanno/welsh-academy/pkg/recipe"
 	"github.com/mjehanno/welsh-academy/pkg/user"
 	swaggerfiles "github.com/swaggo/files"
@@ -16,7 +17,7 @@ import (
 
 var db *gorm.DB
 var userService *user.UserService
-var ingredientService *recipe.IngredientService
+var ingredientService *ingredient.IngredientService
 var recipeService *recipe.RecipeService
 
 func init() {
@@ -25,12 +26,12 @@ func init() {
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		log.Fatalf("couldn't connect to database : %w", err)
+		log.Fatalf("couldn't connect to database : %s", err.Error())
 	}
-	db.AutoMigrate(&user.User{}, &recipe.Ingredient{}, &recipe.Recipe{})
+	db.AutoMigrate(&user.User{}, &ingredient.Ingredient{}, &recipe.Recipe{})
 
 	userService = user.NewUserService(db)
-	ingredientService = recipe.NewIngredientService(db)
+	ingredientService = ingredient.NewIngredientService(db)
 	recipeService = recipe.NewRecipeService(db)
 }
 

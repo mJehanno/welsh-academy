@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mjehanno/welsh-academy/pkg/error"
-	"github.com/mjehanno/welsh-academy/pkg/recipe"
+	"github.com/mjehanno/welsh-academy/pkg/ingredient"
 )
 
 // @Summary      Create an Ingredient
@@ -13,13 +13,13 @@ import (
 // @Tags         ingredients
 // @Accept       json
 // @Produce      json
-// @Param ingredient body recipe.Ingredient true "ingredient to create"
+// @Param ingredient body ingredient.Ingredient true "ingredient to create"
 // @Success      201  {integer}  id
 // @Failure      400  {object}  error.ErrorResponse
 // @Failure      500
 // @Router       /ingredients [post]
 func createIngredientEndpoint(c *gin.Context) {
-	var json recipe.Ingredient
+	var json ingredient.Ingredient
 
 	if err := c.ShouldBindJSON(&json); err != nil {
 		c.JSON(http.StatusBadRequest, error.ErrorResponse{ErrorMessage: err.Error()})
@@ -41,7 +41,7 @@ func createIngredientEndpoint(c *gin.Context) {
 // @Description  Get the whole list of ingredients.
 // @Tags         ingredients
 // @Produce      json
-// @Success      200  {array}  recipe.Ingredient
+// @Success      200  {array}  ingredient.Ingredient
 // @Failure      500
 // @Router       /ingredients [get]
 func getIngredientEndpoint(c *gin.Context) {

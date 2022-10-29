@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mjehanno/welsh-academy/pkg/error"
+	"github.com/mjehanno/welsh-academy/pkg/ingredient"
 	"github.com/mjehanno/welsh-academy/pkg/recipe"
 )
 
@@ -25,7 +26,7 @@ func getRecipeEndoint(c *gin.Context) {
 		if len(ingredientQuery) == 1 && strings.Contains(ingredientQuery[0], ",") {
 			ingredientsName = strings.Split(ingredientQuery[0], ",")
 		}
-		ingredients := make([]recipe.Ingredient, len(ingredientsName))
+		ingredients := make([]ingredient.Ingredient, len(ingredientsName))
 
 		for i, name := range ingredientsName {
 			ing, err := ingredientService.GetIngredientByName(name)

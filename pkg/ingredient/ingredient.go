@@ -1,4 +1,4 @@
-package recipe
+package ingredient
 
 import "gorm.io/gorm"
 
@@ -7,7 +7,7 @@ import "gorm.io/gorm"
 type Ingredient struct {
 	gorm.Model
 	// The name of the ingredient
-	Name string `example:"cheddar"`
+	Name string `example:"cheddar" gorm:"unique;not null; default:null"`
 	// Recipes []*Recipe `gorm:"many2many:recipe_ingredient;"`
 }
 

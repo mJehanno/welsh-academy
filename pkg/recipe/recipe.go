@@ -1,6 +1,7 @@
 package recipe
 
 import (
+	"github.com/mjehanno/welsh-academy/pkg/ingredient"
 	"gorm.io/gorm"
 )
 
@@ -11,7 +12,7 @@ type Recipe struct {
 	// The name of the Recipe
 	Name string `example:"welsh"`
 	// The list of ingredients in the recipe.
-	Ingredients []*Ingredient `gorm:"many2many:recipe_ingredient;"`
+	Ingredients []*ingredient.Ingredient `gorm:"many2many:recipe_ingredient;"`
 }
 
 // RecipeService define a service made to handle recipes.
@@ -36,7 +37,7 @@ func (rs *RecipeService) GetAllRecipe() ([]Recipe, error) {
 }
 
 // GetRecipeByIngredient takes a list of ingredients and returns only the recipe that contains ALL the listed ingredients or an error.
-func (rs *RecipeService) GetRecipeByIngredient(ingredients []Ingredient) ([]Recipe, error) {
+func (rs *RecipeService) GetRecipeByIngredient(ingredients []ingredient.Ingredient) ([]Recipe, error) {
 	var recipes []Recipe
 
 	query := rs.db.Table("recipes")
