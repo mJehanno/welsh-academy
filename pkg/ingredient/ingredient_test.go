@@ -39,6 +39,10 @@ func Setup(t *testing.T) func(t *testing.T) {
 
 	return func(t *testing.T) {
 		defer db.Close()
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %s", err)
+		}
 	}
 }
 
@@ -55,9 +59,6 @@ func TestGetAllIngredient(t *testing.T) {
 		t.Errorf("error occured while it shouldn't have : %s", err.Error())
 	}
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
 }
 
 func TestCreateIngredientSucceed(t *testing.T) {
@@ -73,9 +74,6 @@ func TestCreateIngredientSucceed(t *testing.T) {
 		t.Errorf("error occured while it shouldn't have : %s", err.Error())
 	}
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
 }
 
 func TestCreateIngredientFail(t *testing.T) {
@@ -91,9 +89,6 @@ func TestCreateIngredientFail(t *testing.T) {
 		t.Errorf("error did not occured while it should have : %s", err.Error())
 	}
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
 }
 
 func TestGetIngredientByNameSucceed(t *testing.T) {
@@ -107,9 +102,6 @@ func TestGetIngredientByNameSucceed(t *testing.T) {
 		t.Errorf("error occured while it shouldn't have : %s", err.Error())
 	}
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
 }
 
 func TestGetIngredientByNameFail(t *testing.T) {
@@ -123,7 +115,4 @@ func TestGetIngredientByNameFail(t *testing.T) {
 		t.Errorf("error did not occured while it should have : %s", err.Error())
 	}
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
 }
