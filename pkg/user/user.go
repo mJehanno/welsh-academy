@@ -2,7 +2,6 @@ package user
 
 import (
 	"crypto/sha256"
-	"database/sql/driver"
 	"fmt"
 
 	"github.com/mjehanno/welsh-academy/pkg/recipe"
@@ -16,15 +15,6 @@ const (
 	CheddarExpert Role = "cheddarexpert"
 	Admin         Role = "admin"
 )
-
-func (r *Role) Scan(value interface{}) error {
-	*r = Role(value.([]byte))
-	return nil
-}
-
-func (r Role) Value() (driver.Value, error) {
-	return string(r), nil
-}
 
 // User represent user.
 type User struct {
