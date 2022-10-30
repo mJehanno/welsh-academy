@@ -5,8 +5,10 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kataras/jwt"
 	"github.com/mjehanno/welsh-academy/pkg/error"
 	"github.com/mjehanno/welsh-academy/pkg/recipe"
 	"github.com/mjehanno/welsh-academy/pkg/user"
@@ -22,22 +24,48 @@ import (
 // @Param user body user.User true "user that need to be created"
 // @Success 201 {number} id
 // @Failure 400 {object} error.ErrorResponse
+// @Failure 401
+// @Failure 403
 // @Failure 500
 // @Router /users [post]
 func createUserEndpoint(c *gin.Context) {
-	var json user.User
+	var jsonPayload user.User
 
-	if err := c.ShouldBindJSON(&json); err != nil {
+	cookie, err := c.Cookie("jwt")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, nil)
+		return
+	}
+
+	verifiedToken, err := jwt.Verify(jwt.HS256, sharedKey, []byte(cookie))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, nil)
+		return
+	}
+
+	var currentUser user.User
+	err = verifiedToken.Claims(&currentUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, nil)
+		return
+	}
+
+	if currentUser.Role != user.Admin {
+		c.JSON(http.StatusForbidden, nil)
+		return
+	}
+
+	if err := c.ShouldBindJSON(&jsonPayload); err != nil {
 		c.JSON(http.StatusBadRequest, error.ErrorResponse{ErrorMessage: err.Error()})
 		return
 	}
 
-	if json.Password == "" || json.Username == "" {
+	if jsonPayload.Password == "" || jsonPayload.Username == "" {
 		c.JSON(http.StatusBadRequest, error.ErrorResponse{ErrorMessage: "can't create user with empty username/password"})
 		return
 	}
 
-	id, err := userService.CreateUser(json)
+	id, err := userService.CreateUser(jsonPayload)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, nil)
 		return
@@ -79,8 +107,12 @@ func loginUserEndpoint(c *gin.Context) {
 	}
 
 	if user != nil {
-		c.SetCookie("user", user.Username, 36000, "/", "localhost", false, true)
-		c.SetCookie("userID", strconv.Itoa(int(user.ID)), 36000, "/", "localhost", false, true)
+		token, err := jwt.Sign(jwt.HS256, sharedKey, user, jwt.MaxAge(15*time.Minute))
+		if err != nil {
+			log.Printf("error while signing token : %s", err.Error())
+		}
+
+		c.SetCookie("jwt", string(token), 36000, "/", "localhost", false, true)
 		c.JSON(http.StatusOK, nil)
 		return
 	}
@@ -107,19 +139,26 @@ func createFavoriteRecipeEndpoint(c *gin.Context) {
 		return
 	}
 
-	cookie, err := c.Cookie("userID")
+	cookie, err := c.Cookie("jwt")
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, nil)
 		return
 	}
 
-	userId, err := strconv.ParseUint(cookie, 10, 64)
+	verifiedToken, err := jwt.Verify(jwt.HS256, sharedKey, []byte(cookie))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, error.ErrorResponse{ErrorMessage: err.Error()})
+		c.JSON(http.StatusInternalServerError, nil)
 		return
 	}
 
-	err = userService.AddFavoriteRecipe(json, uint(userId))
+	var currentUser user.User
+	err = verifiedToken.Claims(&currentUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, nil)
+		return
+	}
+
+	err = userService.AddFavoriteRecipe(json, currentUser.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, nil)
 		return
@@ -138,19 +177,26 @@ func createFavoriteRecipeEndpoint(c *gin.Context) {
 // @Failure      500
 // @Router       /users/favorites [get]
 func getFavoriteRecipeEndpoint(c *gin.Context) {
-	cookie, err := c.Cookie("userID")
+	cookie, err := c.Cookie("jwt")
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, nil)
 		return
 	}
 
-	userId, err := strconv.ParseUint(cookie, 10, 64)
+	verifiedToken, err := jwt.Verify(jwt.HS256, sharedKey, []byte(cookie))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, error.ErrorResponse{ErrorMessage: err.Error()})
+		c.JSON(http.StatusInternalServerError, nil)
 		return
 	}
 
-	recipes, err := userService.GetFavoriteRecipe(uint(userId))
+	var currentUser user.User
+	err = verifiedToken.Claims(&currentUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, nil)
+		return
+	}
+
+	recipes, err := userService.GetFavoriteRecipe(currentUser.ID)
 	if err != nil {
 		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, nil)
@@ -171,15 +217,22 @@ func getFavoriteRecipeEndpoint(c *gin.Context) {
 // @Failure      500
 // @Router       /users/favorites/{id} [delete]
 func deleteFavoriteRecipeEndpoint(c *gin.Context) {
-	cookie, err := c.Cookie("userID")
+	cookie, err := c.Cookie("jwt")
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, nil)
 		return
 	}
 
-	userId, err := strconv.ParseUint(cookie, 10, 64)
+	verifiedToken, err := jwt.Verify(jwt.HS256, sharedKey, []byte(cookie))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, error.ErrorResponse{ErrorMessage: err.Error()})
+		c.JSON(http.StatusInternalServerError, nil)
+		return
+	}
+
+	var currentUser user.User
+	err = verifiedToken.Claims(&currentUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, nil)
 		return
 	}
 
@@ -197,7 +250,7 @@ func deleteFavoriteRecipeEndpoint(c *gin.Context) {
 		return
 	}
 
-	err = userService.DeleteFavoriteRecipe(recipe, uint(userId))
+	err = userService.DeleteFavoriteRecipe(recipe, currentUser.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, nil)
 		return

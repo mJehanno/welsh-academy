@@ -19,6 +19,7 @@ var db *gorm.DB
 var userService *user.UserService
 var ingredientService *ingredient.IngredientService
 var recipeService *recipe.RecipeService
+var sharedKey = []byte("asupersecrettokenthatnooneshouldknow")
 
 func init() {
 	var err error

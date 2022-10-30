@@ -51,7 +51,8 @@ Retrieve one or many recipe/ingredient | GET
 Create a recipe/ingredient/user | POST
 Untag a favorite recipe | DELETE
 
-Considered route are either
+Some request might need user to log in.
+Authorization are handled with signed JWT token passed by cookie (not the best solution but at least it works)
 
 StatusCode :
 - 200 => action did work
@@ -59,6 +60,7 @@ StatusCode :
 - 204 => content has been deleted
 - 400 => error from user 
 - 401 => need to login before
+- 403 => user is logged but do not have permissions
 - 500 => error in the api
 
 
