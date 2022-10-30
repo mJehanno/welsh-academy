@@ -71,7 +71,7 @@ func TestCreateUserFailOnEmptyName(t *testing.T) {
 	mock.ExpectRollback()
 	_, err := userService.CreateUser(User{Username: "", Password: "mytopsecretpassword"})
 	if err == nil {
-		t.Errorf("error did not occured while it should have")
+		t.Error("error did not occured while it should have")
 	}
 }
 
@@ -112,7 +112,7 @@ func TestLogUserFail(t *testing.T) {
 
 	_, err := userService.LogUser(User{Username: "cam-amber", Password: "mynotsosecretpassword"})
 	if err == nil {
-		t.Errorf("error did not occured while it should have")
+		t.Error("error did not occured while it should have")
 	}
 
 }
@@ -207,6 +207,6 @@ func TestDeleteFavoriteRecipeFail(t *testing.T) {
 
 	err := userService.DeleteFavoriteRecipe(recipe.Recipe{Name: "welsh", Ingredients: []*ingredient.Ingredient{{Name: "cheddar"}, {Name: "bière brune"}}}, 1)
 	if err == nil {
-		t.Error("error occured while it shouldn't have")
+		t.Error("error did not occured while it should have")
 	}
 }
