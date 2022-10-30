@@ -28,6 +28,19 @@ func init() {
 	if err != nil {
 		log.Fatalf("couldn't connect to database : %s", err.Error())
 	}
+
+	db.Exec(`DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'roles') THEN
+        CREATE TYPE roles as ENUM
+        (
+            'basicuser',
+            'cheddarexpert',
+            'admin'
+        );
+    END IF;
+END$$;`)
+
 	db.AutoMigrate(&user.User{}, &ingredient.Ingredient{}, &recipe.Recipe{})
 
 	userService = user.NewUserService(db)

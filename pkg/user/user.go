@@ -2,11 +2,29 @@ package user
 
 import (
 	"crypto/sha256"
+	"database/sql/driver"
 	"fmt"
 
 	"github.com/mjehanno/welsh-academy/pkg/recipe"
 	"gorm.io/gorm"
 )
+
+type Role string
+
+const (
+	BasicUser     Role = "basicuser"
+	CheddarExpert Role = "cheddarexpert"
+	Admin         Role = "admin"
+)
+
+func (r *Role) Scan(value interface{}) error {
+	*r = Role(value.([]byte))
+	return nil
+}
+
+func (r Role) Value() (driver.Value, error) {
+	return string(r), nil
+}
 
 // User represent user.
 type User struct {
@@ -17,6 +35,7 @@ type User struct {
 	Password string `gorm:"size:255;not null;default:null" json:",omitempty" example:"admin"`
 	// The user's favorites recipes
 	FavoritesRecipes []recipe.Recipe `gorm:"many2many:favorite_recipe" swaggerignore:"true"`
+	Role             Role            `gorm:"type:roles"`
 }
 
 // NewUserService is the constructor for a UserService.
