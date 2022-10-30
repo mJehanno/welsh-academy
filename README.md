@@ -35,7 +35,7 @@ Action | command
 --- | ---
 Build| `go build -o ./bin/welsh-academy -v cmd/welsh-academy/main.go`
 Run| `./bin/welsh-academy`
-Test | `go test ./... -v -cover`
+Test | `go test ./... -cover`
 Coverage | `go test ./... -coverprofile=coverage.out`
 Build the Docker image | `docker build . -t rest-document`
 Run the Docker container | `docker run -p 9000:9000 rest-document`

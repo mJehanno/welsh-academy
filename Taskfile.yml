@@ -17,5 +17,10 @@ tasks:
     aliases: [gen-swagger]
     cmds: 
       - swag init -g cmd/welsh-academy/main.go --parseDependency --parseInternal
-
+  test:
+    cmds:
+      - cmd: go test ./... -cover
+        ignore_error: true
+  coverage:
+      - go test ./... -coverprofile=coverage.out
         
