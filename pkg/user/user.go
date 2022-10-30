@@ -12,9 +12,9 @@ import (
 type User struct {
 	gorm.Model
 	// The name of the user.
-	Username string `gorm:"type:varchar(40);unique" example:"admin"`
+	Username string `gorm:"type:varchar(40);unique;not null;default:null" example:"admin"`
 	// The password of the user
-	Password string `gorm:"size:255" json:",omitempty" example:"admin"`
+	Password string `gorm:"size:255;not null;default:null" json:",omitempty" example:"admin"`
 	// The user's favorites recipes
 	FavoritesRecipes []recipe.Recipe `gorm:"many2many:favorite_recipe" swaggerignore:"true"`
 }
@@ -50,17 +50,12 @@ func (us *UserService) LogUser(user User) (*User, error) {
 	hash := h.Sum(nil)
 	var dbUser User
 
-	err := us.db.Where("username = ?", user.Username).First(&dbUser).Error
+	err := us.db.Where("username = ?", user.Username).Where("password = ?", fmt.Sprintf("%x", string(hash))).Omit("password", "created_at", "deleted_at", "updated_at").First(&dbUser).Error
 	if err != nil {
 		return nil, err
 	}
 
-	if dbUser.Password == fmt.Sprintf("%x", string(hash)) {
-		dbUser.Password = ""
-		return &dbUser, nil
-	}
-
-	return nil, nil
+	return &dbUser, nil
 }
 
 // AddFavoriteRecipe takes a recipe and a userID (uint) and add the recipe to the corresponding user.

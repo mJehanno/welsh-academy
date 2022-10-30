@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -9,6 +10,7 @@ import (
 	"github.com/mjehanno/welsh-academy/pkg/error"
 	"github.com/mjehanno/welsh-academy/pkg/recipe"
 	"github.com/mjehanno/welsh-academy/pkg/user"
+	"gorm.io/gorm"
 )
 
 // @Summary Create user
@@ -67,6 +69,11 @@ func loginUserEndpoint(c *gin.Context) {
 
 	user, err := userService.LogUser(json)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusBadRequest, error.ErrorResponse{ErrorMessage: "wrong data for user/password"})
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, nil)
 		return
 	}
