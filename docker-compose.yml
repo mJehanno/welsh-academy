@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+
+  db:
+    image: postgres:latest
+    container_name: welsh-db
+    volumes:
+    - db_data:/var/lib/pgsql
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: awelshysecretpassword
+      POSTGRES_USER: welsh-admin
+      POSTGRES_DB: welsh-academy
+  welsh-rest:
+    depends_on:
+      - db
+    image: mjehanno/welsh-academy:latest
+    container_name: welsh-rest
+    ports:
+      - "9000:9000"
+    restart: always
+    environment:
+      PORT: 9000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: "welsh-admin"
+      DB_PASS: "awelshysecretpassword"
+      DB_NAME: "welsh-academy"
+      GIN_MODE: release
+
+volumes:
+  db_data:
