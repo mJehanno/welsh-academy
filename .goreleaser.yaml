@@ -31,5 +31,6 @@ changelog:
       - '^test:'
 dockers:
   -
+    dockerfile: 'goreleaser.dockerfile'
     image_templates:
     - mjehanno/welsh-academy
