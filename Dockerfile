@@ -9,6 +9,7 @@ ENV DB_PORT=5432
 ENV DB_USER="admin"
 ENV DB_PASS="admin"
 ENV DB_NAME="welsh"
+ENV GIN_MODE=release
 
 RUN go mod download
 
