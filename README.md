@@ -63,10 +63,13 @@ StatusCode :
 - 403 => user is logged but do not have permissions
 - 500 => error in the api
 
+Disclaimer : the JWT shouldn't be sent back through a Cookie. Moreover there are some solutions that might do a better job than JWT (like Biscuit maybe ..) 
 
 ## Documentation
 
 The api documentation is available as an OpenAPI spec file. 
 This file is loaded as the application start and rendered on `:9000/docs/index.html`.
 
+## Deployment
 
+Currently this project is deployed to DockerHub and Github Releases thanks to `goreleaser`. This one is launched on my local machine, it would be better to run it in CI/CD after passing code analysis, build and test stages.
