@@ -42,7 +42,10 @@ BEGIN
     END IF;
 END$$;`)
 
-	db.AutoMigrate(&user.User{}, &ingredient.Ingredient{}, &recipe.Recipe{})
+	err = db.AutoMigrate(&user.User{}, &ingredient.Ingredient{}, &recipe.Recipe{})
+	if err != nil {
+		log.Fatalf("couldn't not create the database via migration : %s", err.Error())
+	}
 
 	userService = user.NewUserService(db)
 	ingredientService = ingredient.NewIngredientService(db)
@@ -50,17 +53,20 @@ END$$;`)
 }
 
 // @title           Welsh-Academy OpenAPI Spec
-// @version         1.0
+// @version         1.2.3
 // @description     This is a rest api made to handle some recipe so please have a sit and chees... chill !
 // @termsOfService  http://swagger.io/terms/
 // @contact.name   API Support
 // @contact.email  mathob.jehanno@hotmail.fr
-// @license.name  Beerware 42.0
+// @license.name  GPL-3.0
 // @host      localhost:9000
 // @BasePath  /api/v1
 func main() {
 	r := gin.Default()
-	r.SetTrustedProxies(nil)
+	err := r.SetTrustedProxies(nil)
+	if err != nil {
+		log.Printf("couldn't unset trusted proxies on http server : %s", err.Error())
+	}
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	api := r.Group("/api")
@@ -93,5 +99,8 @@ func main() {
 	}
 	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	r.Run()
+	err = r.Run()
+	if err != nil {
+		log.Fatalf("couldn't start http server : %s", err.Error())
+	}
 }
