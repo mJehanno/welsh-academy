@@ -10,6 +10,8 @@ ENV DB_USER="admin"
 ENV DB_PASS="admin"
 ENV DB_NAME="welsh"
 ENV GIN_MODE=release
+ENV ADMIN_USERNAME=admin
+ENV ADMIN_PASSWORD=admin
 
 RUN go mod download
 

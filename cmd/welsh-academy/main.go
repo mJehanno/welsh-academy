@@ -30,7 +30,7 @@ func init() {
 		log.Fatalf("couldn't connect to database : %s", err.Error())
 	}
 
-	db.Exec(`DO $$
+	result := db.Exec(`DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'roles') THEN
         CREATE TYPE roles as ENUM
@@ -41,6 +41,9 @@ BEGIN
         );
     END IF;
 END$$;`)
+	if result.Error != nil {
+		log.Fatalf("couldn'nt create role type in db : %s", err.Error())
+	}
 
 	err = db.AutoMigrate(&user.User{}, &ingredient.Ingredient{}, &recipe.Recipe{})
 	if err != nil {
@@ -50,6 +53,21 @@ END$$;`)
 	userService = user.NewUserService(db)
 	ingredientService = ingredient.NewIngredientService(db)
 	recipeService = recipe.NewRecipeService(db)
+
+}
+
+func createAdminUser() {
+	var admin user.User
+	result := db.Model(&user.User{}).First(admin)
+	if result.Error != nil {
+		admin.Username = os.Getenv("ADMIN_USERNAME")
+		admin.Password = os.Getenv("ADMIN_PASSWORD")
+		admin.Role = user.Admin
+		_, err := userService.CreateUser(admin)
+		if err != nil {
+			log.Println("couldn't create admin user, you'll need to create it manually in the database")
+		}
+	}
 }
 
 // @title           Welsh-Academy OpenAPI Spec
@@ -62,6 +80,7 @@ END$$;`)
 // @host      localhost:9000
 // @BasePath  /api/v1
 func main() {
+	createAdminUser()
 	r := gin.Default()
 	err := r.SetTrustedProxies(nil)
 	if err != nil {

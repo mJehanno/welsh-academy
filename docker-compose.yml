@@ -28,6 +28,7 @@ services:
       DB_PASS: "awelshysecretpassword"
       DB_NAME: "welsh-academy"
       GIN_MODE: release
-
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin
 volumes:
   db_data:
